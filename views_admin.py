@@ -107,8 +107,8 @@ def admin_rooms_toggle(id):
 @get('/admin/beds')
 @auth.role_required('admin')
 def admin_beds():
-    area_id = request.query.get('area_id')
-    room_id = request.query.get('room_id')
+    area_id = request.query.decode().get('area_id')
+    room_id = request.query.decode().get('room_id')
 
     query = Bed.select().join(Room)
     
@@ -291,15 +291,15 @@ def admin_logs():
         query = StateChangeLog.select().order_by(StateChangeLog.changed_at.desc())
         
         # フィルタ
-        area_id = request.query.get('area_id')
+        area_id = request.query.decode().get('area_id')
         if area_id:
             query = query.where(StateChangeLog.area == area_id)
             
-        target_type = request.query.get('target_type')
+        target_type = request.query.decode().get('target_type')
         if target_type:
             query = query.where(StateChangeLog.target_type == target_type)
             
-        user_id = request.query.get('user_id')
+        user_id = request.query.decode().get('user_id')
         if user_id:
             query = query.where(StateChangeLog.changed_by == user_id)
         
