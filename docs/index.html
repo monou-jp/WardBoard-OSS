@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WardBoard-OSS - 院内向け簡易ベッド／部屋状況ボード</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #0d6efd 0%, #004085 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        .section-padding {
+            padding: 80px 0;
+        }
+        .bg-light-gray {
+            background-color: #f8f9fa;
+        }
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .card {
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-card {
+            height: 100%;
+        }
+        code {
+            color: #212529;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">WardBoard-OSS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#overview">概要</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#screenshots">画面サンプル</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">特徴</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#functions">機能</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#setup">導入方法</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#security">セキュリティ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#license">ライセンス</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://monou.jp" target="_blank" class="nav-link text-info"><i class="bi bi-house-heart"></i> 開発元:門王</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://github.com/user/WardBoard-OSS" target="_blank"><i class="bi bi-github"></i> GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-4">WardBoard-OSS</h1>
+            <p class="lead mb-3">病棟、備品、会議室など「場所とモノ」の今を可視化する。<br>個人情報を扱わない、軽量・セキュアなステータス管理ボード。</p>
+            <p class="mb-5 opacity-75">ホワイトボードの運用をそのままWebへ。複雑なシステム連携は不要です。</p>
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="#setup" class="btn btn-light btn-lg px-4 gap-3">使ってみる</a>
+                <a href="https://github.com/user/WardBoard-OSS" class="btn btn-outline-light btn-lg px-4">GitHubで見る</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Overview & Usage -->
+    <section id="overview" class="section-padding">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">開発の背景と概要</h2>
+                    <p>医療現場では、今でもホワイトボードやマグネットを使ってベッドの空き状況を管理している場面が多くあります。しかし、これらには「現場に行かないと状況がわからない」「転記ミスが起きる」といった課題がありました。</p>
+                    <p><strong>WardBoard-OSS</strong> は、そのような「アナログなホワイトボード運用」をデジタルの力で補完するために生まれました。電子カルテのような大規模なシステムを導入することなく、ブラウザひとつでどこからでも状況を把握できます。</p>
+                    <p>最大の特徴は、<strong>「患者の個人情報を一切持たない」</strong>という設計思想です。管理するのはあくまで「場所（ベッド・部屋）」の状態のみ。だからこそ、導入のハードルが低く、セキュアに運用できます。</p>
+                    <div class="mt-4 p-3 bg-light border-start border-4 border-primary">
+                        <p class="mb-0 small text-muted">本プロジェクトは <a href="https://monou.jp" target="_blank" class="fw-bold text-decoration-none">門王 (monou.jp)</a> によって開発・メンテナンスされています。医療現場のDXを、シンプルかつセキュアに推進することを目指しています。</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="bg-light p-4 rounded-4 border">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb-fill text-warning me-2"></i>幅広い活用シーン</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-3 d-flex">
+                                <i class="bi bi-check2-circle text-primary me-2 mt-1"></i>
+                                <div><strong>病棟・外来のベッド・診察室管理</strong><br><small class="text-muted">ナースステーション、医局、受付でのリアルタイムな情報共有に。</small></div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="bi bi-check2-circle text-primary me-2 mt-1"></i>
+                                <div><strong>医療機器・ME機器の貸出管理</strong><br><small class="text-muted">人工呼吸器や輸液ポンプなどの所在とステータス（使用中・点検中）を把握。</small></div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="bi bi-check2-circle text-primary me-2 mt-1"></i>
+                                <div><strong>会議室・共有スペースの利用状況</strong><br><small class="text-muted">「空き」「予約あり」「清掃中」など、部屋の状況を可視化。</small></div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="bi bi-check2-circle text-primary me-2 mt-1"></i>
+                                <div><strong>公用車・共有車両の稼働管理</strong><br><small class="text-muted">車両ごとの貸出状況やメンテナンス予定の共有に。</small></div>
+                            </li>
+                            <li class="d-flex">
+                                <i class="bi bi-check2-circle text-primary me-2 mt-1"></i>
+                                <div><strong>イベント会場・健診センター</strong><br><small class="text-muted">各ブースや受付の混雑状況、進行状況のサイネージとして。</small></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section id="screenshots" class="section-padding bg-light">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">画面サンプル</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <img src="./asset/img/ss_board.png" class="card-img-top" alt="ダッシュボード画面">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">メインボード画面</h5>
+                            <p class="card-text text-muted">タイル形式で現在のステータスを一覧表示。クリックで素早く状態を変更できます。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <img src="./asset/img/ss_admin.png" class="card-img-top" alt="管理画面">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">管理設定画面</h5>
+                            <p class="card-text text-muted">エリア、部屋、ベッドの登録や、状態マスタのカスタマイズが可能です。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <img src="./asset/img/ss_signage.png" class="card-img-top" alt="サイネージモード">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">閲覧専用（サイネージ）モード</h5>
+                            <p class="card-text text-muted">30秒ごとの自動更新。大型モニターに表示して共有するのに最適です。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <img src="./asset/img/ss_log.png" class="card-img-top" alt="運用ログ">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">運用履歴ログ</h5>
+                            <p class="card-text text-muted">「誰が・いつ・何を」変更したかを正確に記録。監査証跡としても有効です。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section id="features" class="section-padding bg-light-gray">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">主な特徴</h2>
+            <div class="row g-4">
+                <div class="col-md-3 text-center">
+                    <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
+                    <h4>個人情報を扱わない</h4>
+                    <p class="text-muted">患者名や病名、IDなどは一切入力・保存しません。DBが盗難・流出したとしても個人情報漏洩のリスクはありません。</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="feature-icon"><i class="bi bi-rocket-takeoff"></i></div>
+                    <h4>導入が極めて簡単</h4>
+                    <p class="text-muted">Python 3.7+ と SQLite があれば動作。CGI、WSGI環境に対応。Dockerなしでも数分でセットアップ完了します。</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="feature-icon"><i class="bi bi-sliders"></i></div>
+                    <h4>高いカスタマイズ性</h4>
+                    <p class="text-muted">「空き」「使用中」「清掃中」など、運用に合わせた状態マスタを自由に作成。色やアイコンも変更可能です。</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="feature-icon"><i class="bi bi-gear-wide-connected"></i></div>
+                    <h4>運用を自動化</h4>
+                    <p class="text-muted">深夜の決まった時間に「清掃中」を「空き」に自動リセット。手動操作の手間を減らす仕組みを備えています。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Functions -->
+    <section id="functions" class="section-padding">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">詳細な機能</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card border-0 shadow-sm p-4">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold"><i class="bi bi-grid-3x3-gap text-primary me-2"></i>ボード表示と状態変更</h5>
+                            <p class="card-text text-muted">エリア内の状況をタイル形式で一覧。クリック（タップ）するだけで状態を切り替えられます。確認ダイアログの有無も設定可能です。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card border-0 shadow-sm p-4">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold"><i class="bi bi-display text-primary me-2"></i>表示専用・デジタルサイネージ</h5>
+                            <p class="card-text text-muted">操作メニューを隠した閲覧専用URL。30秒ごとの自動更新機能を備え、大型モニターでの常時表示に最適です。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card border-0 shadow-sm p-4">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold"><i class="bi bi-bar-chart-line text-primary me-2"></i>リアルタイム集計画面</h5>
+                            <p class="card-text text-muted">全エリア、またはエリアごとの「空き」「使用中」等の数を自動集計。現在の稼働率を瞬時に把握できます。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card border-0 shadow-sm p-4">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold"><i class="bi bi-journal-text text-primary me-2"></i>運用ログと監査履歴</h5>
+                            <p class="card-text text-muted">「いつ、誰が、どの項目を、何から何へ変更したか」を全て記録。過去90日分（設定可能）のログを保持します。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card border-0 shadow-sm p-4">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold"><i class="bi bi-people text-primary me-2"></i>柔軟な権限管理</h5>
+                            <p class="card-text text-muted">管理者（全機能）、オペレーター（更新のみ）、閲覧者（見るだけ）の3段階。現場の役割に合わせて使い分けられます。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card border-0 shadow-sm p-4">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold"><i class="bi bi-moon-stars text-primary me-2"></i>マルチデバイス・テーマ</h5>
+                            <p class="card-text text-muted">レスポンシブ設計に加え、ダークモードにも対応。タブレット端末での運用も非常にスムーズです。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Setup Guide -->
+    <section id="setup" class="section-padding bg-light-gray">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">導入手順</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <!-- Environment Info -->
+                    <div class="card border-0 shadow-sm mb-5">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-cpu text-primary me-2"></i>動作環境 / 技術スタック</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled mb-0">
+                                        <li><strong>言語:</strong> Python 3.7+</li>
+                                        <li><strong>Webフレームワーク:</strong> Bottle</li>
+                                        <li><strong>ORM:</strong> Peewee</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled mb-0">
+                                        <li><strong>DB:</strong> SQLite (設定により他DBも可)</li>
+                                        <li><strong>UI:</strong> Bootstrap 5 / Jinja2</li>
+                                        <li><strong>認証:</strong> itsdangerous (署名付きCookie)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-5">
+                        <div class="step-number me-3">1</div>
+                        <div>
+                            <h5>ライブラリのインストール</h5>
+                            <p>Python 3.7以降がインストールされた環境で、以下のコマンドを実行して依存ライブラリをインストールします。</p>
+                            <pre><code>pip install bottle peewee jinja2 itsdangerous</code></pre>
+                            <p class="small text-muted">※WSGIサーバー（Gunicorn, Waitress等）を使用する場合は、別途インストールしてください。</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-5">
+                        <div class="step-number me-3">2</div>
+                        <div>
+                            <h5>システムの起動</h5>
+                            <p>リポジトリをダウンロードし、そのディレクトリ内で以下のコマンドを実行します。</p>
+                            <pre><code>python app.py</code></pre>
+                            <p>デフォルトでは <code>http://localhost:8080</code> で起動します。サーバー起動オプションは <code>config.py</code> で変更可能です。</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-5">
+                        <div class="step-number me-3">3</div>
+                        <div>
+                            <h5>初期セットアップ</h5>
+                            <p>ブラウザで <code>/install</code> にアクセスし、最初の管理者ユーザーを作成します。その後ログインし、管理メニューから以下の順に設定を行います。</p>
+                            <div class="card border-0 shadow-sm mt-3">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>1. エリア登録</strong>: 運用単位（A病棟、外来、会議室、車両等）を登録します。</li>
+                                    <li class="list-group-item"><strong>2. 部屋登録</strong>: エリアに紐づく項目（301号室、第1会議室、車両ナンバー等）を登録します。</li>
+                                    <li class="list-group-item"><strong>3. ベッド登録</strong>: 部屋の中に複数の管理単位（ベッド、備品等）がある場合のみ登録します（オプション）。</li>
+                                    <li class="list-group-item"><strong>4. ユーザー登録</strong>: 他のスタッフ用のカウントを作成します。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="step-number me-3">4</div>
+                        <div>
+                            <h5>（任意）カスタマイズ</h5>
+                            <p>必要に応じて、状態マスタの色やアイコンを変更したり、自動リセット時間を <code>config.py</code> で設定してください。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security & Important Notes -->
+    <section id="security" class="section-padding bg-dark text-white">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">セキュリティと設計思想</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex">
+                        <i class="bi bi-shield-check text-success me-3 fs-4"></i>
+                        <div>
+                            <h5>徹底した匿名性</h5>
+                            <p class="text-secondary small">患者の氏名、年齢、ID、病名、入退院予定日など、いかなる個人情報も入力することを許可しません。入力フォーム自体が存在しないため、オペレーションミスによる情報漏洩も防ぎます。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex">
+                        <i class="bi bi-lock-fill text-info me-3 fs-4"></i>
+                        <div>
+                            <h5>クローズドネットワーク前提</h5>
+                            <p class="text-secondary small">本システムは院内LANなどでの利用を想定しています。インターネットに公開する場合は、Nginx等のリバースプロキシによるSSL化やVPN経由でのアクセスを強く推奨します。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex">
+                        <i class="bi bi-hdd-network-fill text-warning me-3 fs-4"></i>
+                        <div>
+                            <h5>依存性の最小化</h5>
+                            <p class="text-secondary small">外部APIやクラウドサービスには一切依存しません。全てのデータはローカルのSQLiteに保存されるため、オフライン環境でも確実に動作します。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="alert alert-secondary bg-opacity-10 border-secondary small">
+                        <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                        <strong>重要:</strong> 本システムは「ホワイトボードのWeb化」に特化しています。電子カルテの代替や、医療的な意思決定を支援するものではありません。運用にあたっては各施設の情報セキュリティポリシーに従ってください。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Version History -->
+    <section class="section-padding">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">アップデート履歴</h2>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>バージョン</th>
+                            <th>主な更新内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>v1.4</td>
+                            <td>自動リセット機能、ダークモード対応、表示専用モードのオプション追加</td>
+                        </tr>
+                        <tr>
+                            <td>v1.3</td>
+                            <td>状態運用の柔軟化（部屋/ベッド別）、簡易集計画面の追加</td>
+                        </tr>
+                        <tr>
+                            <td>v1.2</td>
+                            <td>運用ログ（変更履歴）機能、ログ保持期間設定の追加</td>
+                        </tr>
+                        <tr>
+                            <td>v1.1</td>
+                            <td>表示専用モード、変更確認モーダル、クエリ最適化</td>
+                        </tr>
+                        <tr>
+                            <td>v1.0</td>
+                            <td>初回リリース</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- License & Support -->
+    <section id="license" class="section-padding bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card border-0 shadow-sm overflow-hidden">
+                        <div class="row g-0">
+                            <div class="col-md-4 bg-primary text-white d-flex align-items-center justify-content-center p-4">
+                                <div class="text-center">
+                                    <i class="bi bi-file-earmark-text mb-3" style="font-size: 4rem;"></i>
+                                    <h3 class="fw-bold">ライセンス</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body p-4 p-lg-5">
+                                    <h4 class="fw-bold mb-4">OSS版と商用利用について</h4>
+                                    <p>WardBoard-OSSは <strong>GNU Affero General Public License v3 (AGPL-3.0)</strong> のもとで公開されており、どなたでも自由にご利用いただけます。ソースコードの改変や再配布も可能ですが、同一ライセンスでの公開が義務付けられます。</p>
+                                    
+                                    <div class="alert alert-info border-0 bg-light-gray mt-4">
+                                        <h5 class="fw-bold"><i class="bi bi-building me-2"></i>商用・カスタマイズのご相談</h5>
+                                        <p class="mb-3 small">以下のような場合は、開発元の門王までお気軽にお問い合わせください。</p>
+                                        <ul class="small mb-4">
+                                            <li>AGPLの制限（ソースコード公開義務）を受けずに商用利用したい（商用ライセンスの発行）</li>
+                                            <li>自社の運用に合わせて独自の機能追加や画面カスタマイズを行いたい</li>
+                                            <li>院内・社内への導入支援や、保守サポートを受けたい</li>
+                                        </ul>
+                                        <a href="https://monou.jp" target="_blank" class="btn btn-primary">
+                                            <i class="bi bi-envelope-fill me-2"></i>門王へ問い合わせる (monou.jp)
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-light py-5">
+        <div class="container text-center">
+            <p class="text-muted mb-2">WardBoard-OSS - Open Source Bed Management System</p>
+            <p class="text-muted small">Licensed under the GNU Affero General Public License v3 (AGPL-3.0)</p>
+            <p class="text-muted small">商用利用・カスタマイズのご相談は <a href="https://monou.jp" target="_blank" class="text-decoration-none">門王</a> まで</p>
+            <div class="mt-4">
+                <p class="mb-1">Developed by <a href="https://monou.jp" target="_blank" class="text-decoration-none fw-bold text-dark">門王 (monou.jp)</a></p>
+                <p class="text-muted small">医療現場のニーズに寄り添う、シンプルで実用的なオープンソースソフトウェアを提供しています。</p>
+            </div>
+            <div class="mt-3">
+                <a href="https://monou.jp" class="text-decoration-none text-dark mx-2"><i class="bi bi-house-heart"></i> Official Site</a>
+                <a href="https://github.com/monou-jp/WardBoard-OSS" class="text-decoration-none text-dark mx-2"><i class="bi bi-github"></i> GitHub Repository</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

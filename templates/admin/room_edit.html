@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% if room %}部屋編集{% else %}新規部屋追加{% endif %}{% endblock %}
+{% block content %}
+<h2>{% if room %}部屋編集: {{ room.name }}{% else %}新規部屋追加{% endif %}</h2>
+
+<div class="card col-md-6">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">エリア</label>
+                <select name="area_id" class="form-select" required>
+                    {% for area in areas %}
+                    <option value="{{ area.id }}" {% if room and room.area.id == area.id %}selected{% endif %}>{{ area.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">部屋コード（例: 301）</label>
+                <input type="text" name="code" class="form-control" value="{{ room.code if room else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">部屋名称（例: 301号室）</label>
+                <input type="text" name="name" class="form-control" value="{{ room.name if room else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">表示順</label>
+                <input type="number" name="sort_order" class="form-control" value="{{ room.sort_order if room else 0 }}">
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <a href="/admin/rooms" class="btn btn-secondary">キャンセル</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

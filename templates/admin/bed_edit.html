@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{% if bed %}ベッド編集{% else %}新規ベッド追加{% endif %}{% endblock %}
+{% block content %}
+<h2>{% if bed %}ベッド編集: {{ bed.name }}{% else %}新規ベッド追加{% endif %}</h2>
+
+<div class="card col-md-6">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">部屋</label>
+                <select name="room_id" class="form-select" required>
+                    {% for room in rooms %}
+                    <option value="{{ room.id }}" {% if bed and bed.room.id == room.id %}selected{% endif %}>{{ room.name }} ({{ room.area.name }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">ベッドコード（例: 301-1）</label>
+                <input type="text" name="code" class="form-control" value="{{ bed.code if bed else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">ベッド名称（例: 窓側1）</label>
+                <input type="text" name="name" class="form-control" value="{{ bed.name if bed else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">表示順</label>
+                <input type="number" name="sort_order" class="form-control" value="{{ bed.sort_order if bed else 0 }}">
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="is_available" class="form-check-input" id="isAvailable" {% if not bed or bed.is_available %}checked{% endif %}>
+                <label class="form-check-label" for="isAvailable">運用可能な病床としてカウントする</label>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <a href="/admin/beds" class="btn btn-secondary">キャンセル</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

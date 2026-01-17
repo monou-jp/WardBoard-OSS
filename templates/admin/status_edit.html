@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{% if status_obj %}状態編集{% else %}新規状態追加{% endif %}{% endblock %}
+{% block content %}
+<h2>{% if status_obj %}状態編集: {{ status_obj.label }}{% else %}新規状態追加{% endif %}</h2>
+
+<div class="card col-md-6">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">識別キー（半角英数）</label>
+                <input type="text" name="key" class="form-control" value="{{ status_obj.key if status_obj else '' }}" required placeholder="vacant, occupiedなど">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">表示ラベル</label>
+                <input type="text" name="label" class="form-control" value="{{ status_obj.label if status_obj else '' }}" required placeholder="空き, 使用中など">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Bootstrap色クラス</label>
+                <input type="text" name="color_class" class="form-control" value="{{ status_obj.color_class if status_obj else 'bg-primary' }}" required placeholder="bg-success, bg-dangerなど">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Bootstrap Iconsクラス</label>
+                <input type="text" name="icon_class" class="form-control" value="{{ status_obj.icon_class if status_obj else 'bi-circle' }}" required placeholder="bi-check-circle, bi-personなど">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">表示順</label>
+                <input type="number" name="sort_order" class="form-control" value="{{ status_obj.sort_order if status_obj else 0 }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label d-block">適用対象</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="applies_to_room" id="checkRoom" value="1" {{ 'checked' if not status_obj or status_obj.applies_to_room else '' }}>
+                    <label class="form-check-label" for="checkRoom">部屋に適用</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="applies_to_bed" id="checkBed" value="1" {{ 'checked' if not status_obj or status_obj.applies_to_bed else '' }}>
+                    <label class="form-check-label" for="checkBed">ベッドに適用</label>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <a href="/admin/statuses" class="btn btn-secondary">キャンセル</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}ボード: {{ current_area.name }} - 院内ボード{% endblock %}
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="nav nav-pills">
+            {% for area in areas %}
+            <a class="nav-link {% if area.id == current_area.id %}active{% endif %}" href="/board/{{ area.id }}">{{ area.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+    {% for data in rooms_data %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ data.room.code }} {{ data.room.name }}</h5>
+            </div>
+            <div class="card-body">
+                {% if data.beds %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for bed_item in data.beds %}
+                        {% set bed = bed_item.obj %}
+                        {% set state = bed_item.state %}
+                        <button class="btn btn-sm d-flex flex-column align-items-center p-2 {% if state %}{{ state.status.color_class }}{% else %}btn-secondary{% endif %} text-white" 
+                                style="width: 80px;"
+                                {% if user.role != 'viewer' %}
+                                data-bs-toggle="modal" data-bs-target="#stateModal" 
+                                data-type="bed" data-id="{{ bed.id }}" data-name="{{ bed.name }}"
+                                {% endif %}>
+                            <span class="small">{{ bed.name }}</span>
+                            <i class="bi {% if state %}{{ state.status.icon_class }}{% else %}bi-question-circle{% endif %} fs-4"></i>
+                            <span class="small">{% if state %}{{ state.status.label }}{% else %}未設定{% endif %}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {% set state = data.room_state %}
+                    <button class="btn w-100 d-flex justify-content-between align-items-center p-3 {% if state %}{{ state.status.color_class }}{% else %}btn-secondary{% endif %} text-white"
+                            {% if user.role != 'viewer' %}
+                            data-bs-toggle="modal" data-bs-target="#stateModal" 
+                            data-type="room" data-id="{{ data.room.id }}" data-name="{{ data.room.name }}"
+                            {% endif %}>
+                        <span class="fs-5 fw-bold">{% if state %}{{ state.status.label }}{% else %}未設定{% endif %}</span>
+                        <i class="bi {% if state %}{{ state.status.icon_class }}{% else %}bi-question-circle{% endif %} fs-2"></i>
+                    </button>
+                {% endif %}
+            </div>
+            <div class="card-footer text-muted small">
+                {% if data.beds %}
+                        {# namespaceを使用してスコープ外でも値を保持できるようにする #}
+                        {% set ns = namespace(last_update=None) %}
+                        {% for bi in data.beds %}
+                            {% if bi.state and (not ns.last_update or bi.state.updated_at > ns.last_update) %}
+                                {% set ns.last_update = bi.state.updated_at %}
+                            {% endif %}
+                        {% endfor %}
+                        更新: {{ ns.last_update.strftime('%m/%d %H:%M') if ns.last_update else '---' }}
+                    {% else %}
+                        更新: {{ data.room_state.updated_at.strftime('%m/%d %H:%M') if data.room_state else '---' }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- State Selection Modal -->
+<div class="modal fade" id="stateModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">状態変更</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p id="targetName" class="fs-5 mb-4"></p>
+                
+                <div id="statusSelection">
+                    <div class="row row-cols-2 g-2">
+                        {% for s in statuses %}
+                        <div class="col status-btn-wrapper" 
+                             data-applies-to-room="{{ '1' if s.applies_to_room else '0' }}"
+                             data-applies-to-bed="{{ '1' if s.applies_to_bed else '0' }}">
+                            <button type="button" class="btn {{ s.color_class }} text-white w-100 p-2 h-100 d-flex flex-column align-items-center justify-content-center btn-status-select" 
+                                    data-status-id="{{ s.id }}" data-status-label="{{ s.label }}">
+                                <i class="bi {{ s.icon_class }} fs-4 mb-1"></i>
+                                <span class="small">{{ s.label }}</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div id="confirmSelection" style="display: none;">
+                    <div class="alert alert-warning">
+                        <h4 class="alert-heading">変更確認</h4>
+                        <p class="fs-5"><span id="confirmTarget" class="fw-bold"></span> を <br>
+                        「<span id="confirmStatus" class="fw-bold"></span>」に変更しますか？</p>
+                    </div>
+                    <form id="stateForm" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="area_id" value="{{ current_area.id }}">
+                        <input type="hidden" name="status_id" id="inputStatusId">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">変更を確定する</button>
+                            <button type="button" id="btnCancelConfirm" class="btn btn-outline-secondary">戻る</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const configConfirm = {{ 'true' if config.CONFIRM_STATE_CHANGE else 'false' }};
+    const stateModal = document.getElementById('stateModal');
+    const statusSelection = document.getElementById('statusSelection');
+    const confirmSelection = document.getElementById('confirmSelection');
+    const stateForm = document.getElementById('stateForm');
+    
+    let currentTarget = {};
+
+    stateModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        currentTarget = {
+            type: button.getAttribute('data-type'),
+            id: button.getAttribute('data-id'),
+            name: button.getAttribute('data-name')
+        };
+        
+        document.getElementById('targetName').textContent = currentTarget.name;
+        document.getElementById('targetName').style.display = 'block';
+        
+        // フィルタリング
+        document.querySelectorAll('.status-btn-wrapper').forEach(el => {
+            const applies = el.getAttribute(`data-applies-to-${currentTarget.type}`);
+            el.style.display = (applies === '1') ? 'block' : 'none';
+        });
+
+        statusSelection.style.display = 'block';
+        confirmSelection.style.display = 'none';
+    });
+
+    document.querySelectorAll('.btn-status-select').forEach(button => {
+        button.addEventListener('click', () => {
+            const statusId = button.getAttribute('data-status-id');
+            const statusLabel = button.getAttribute('data-status-label');
+            
+            if (configConfirm) {
+                document.getElementById('targetName').style.display = 'none';
+                statusSelection.style.display = 'none';
+                confirmSelection.style.display = 'block';
+                document.getElementById('confirmTarget').textContent = currentTarget.name;
+                document.getElementById('confirmStatus').textContent = statusLabel;
+                document.getElementById('inputStatusId').value = statusId;
+                stateForm.action = `/state/${currentTarget.type}/${currentTarget.id}`;
+            } else {
+                document.getElementById('inputStatusId').value = statusId;
+                stateForm.action = `/state/${currentTarget.type}/${currentTarget.id}`;
+                stateForm.submit();
+            }
+        });
+    });
+
+    document.getElementById('btnCancelConfirm').addEventListener('click', () => {
+        document.getElementById('targetName').style.display = 'block';
+        statusSelection.style.display = 'block';
+        confirmSelection.style.display = 'none';
+    });
+</script>
+{% endblock %}

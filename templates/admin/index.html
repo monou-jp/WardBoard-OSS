@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}管理画面 - 院内ボード{% endblock %}
+{% block content %}
+<h2>管理メニュー</h2>
+<div class="row mt-4">
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">エリア管理</h5>
+                <p class="card-text">病棟や外来などの大枠のエリアを登録します。</p>
+                <a href="/admin/areas" class="btn btn-primary">エリア一覧</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">部屋管理</h5>
+                <p class="card-text">エリアに紐づく部屋を登録します。</p>
+                <a href="/admin/rooms" class="btn btn-primary">部屋一覧</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">ベッド管理</h5>
+                <p class="card-text">部屋に紐づくベッドを登録します。</p>
+                <a href="/admin/beds" class="btn btn-primary">ベッド一覧</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">状態マスタ</h5>
+                <p class="card-text">表示する状態（空き、使用中など）を定義します。</p>
+                <a href="/admin/statuses" class="btn btn-primary">状態一覧</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">ユーザー管理</h5>
+                <p class="card-text">スタッフのユーザーアカウントを管理します。</p>
+                <a href="/admin/users" class="btn btn-primary">ユーザー一覧</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 bg-light">
+            <div class="card-body">
+                <h5 class="card-title">変更履歴</h5>
+                <p class="card-text">状態変更の履歴を確認・パージします。</p>
+                <a href="/admin/logs" class="btn btn-secondary">履歴閲覧</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

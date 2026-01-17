@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}ベッド管理 - 院内ボード{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>ベッド一覧</h2>
+    <a href="/admin/beds/new" class="btn btn-success">新規ベッド追加</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" action="/admin/beds" class="row g-3">
+            <div class="col-md-4">
+                <label for="area_id" class="form-label">病棟（エリア）</label>
+                <select name="area_id" id="area_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">全ての病棟</option>
+                    {% for area in areas %}
+                    <option value="{{ area.id }}" {% if area.id == selected_area_id %}selected{% endif %}>{{ area.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="room_id" class="form-label">部屋</label>
+                <select name="room_id" id="room_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">全ての部屋</option>
+                    {% for room in rooms %}
+                    <option value="{{ room.id }}" {% if room.id == selected_room_id %}selected{% endif %}>{{ room.name }} ({{ room.area.name }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <a href="/admin/beds" class="btn btn-outline-secondary">クリア</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>部屋</th>
+            <th>コード</th>
+            <th>名称</th>
+            <th>表示順</th>
+            <th>運用</th>
+            <th>有効</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bed in beds %}
+        <tr>
+            <td>{{ bed.room.name }}</td>
+            <td>{{ bed.code }}</td>
+            <td>{{ bed.name }}</td>
+            <td>{{ bed.sort_order }}</td>
+            <td>
+                {% if bed.is_available %}
+                <span class="badge bg-info">病床</span>
+                {% else %}
+                <span class="badge bg-dark">非運用</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if bed.is_active %}
+                <span class="badge bg-success">有効</span>
+                {% else %}
+                <span class="badge bg-secondary">非表示</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="/admin/beds/{{ bed.id }}/edit" class="btn btn-sm btn-outline-primary">編集</a>
+                <form action="/admin/beds/{{ bed.id }}/toggle_active" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm {% if bed.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                        {% if bed.is_active %}無効化{% else %}有効化{% endif %}
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="mt-3">
+    <a href="/admin" class="btn btn-secondary">管理トップへ戻る</a>
+</div>
+{% endblock %}
